@@ -1,0 +1,22 @@
+{
+  "name": "ios-sudoku-app",
+  "version": "1.0.0",
+  "description": "iOS Native-Aesthetic Sudoku Mini Game - Zero Ads, 4 Difficulties, PWA & Capacitor iOS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build.js",
+    "cap:add": "npx @capacitor/cli add ios",
+    "cap:sync": "node build.js && npx @capacitor/cli sync ios",
+    "cap:open": "npx @capacitor/cli open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  },
+  "author": "Antigravity",
+  "license": "MIT"
+}

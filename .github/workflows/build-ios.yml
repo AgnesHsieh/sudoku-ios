@@ -1,0 +1,58 @@
+name: Build iOS App (.ipa)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build iOS IPA Package
+    runs-on: macos-14
+
+    steps:
+      - name: 檢出程式碼 (Checkout)
+        uses: actions/checkout@v4
+
+      - name: 安裝 Node.js 環境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 安裝專案依賴
+        run: npm install
+
+      - name: 打包前端靜態資源
+        run: node build.js
+
+      - name: 同步至 Capacitor 原生 iOS 專案
+        run: npx @capacitor/cli sync ios
+
+      - name: 使用 Xcode 編譯 (Release 無簽名模式)
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -derivedDataPath ../../build \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            clean build
+
+      - name: 打包生成 .ipa 安裝檔 (Package IPA)
+        run: |
+          mkdir -p build/Payload
+          cp -r build/Build/Products/Release-iphoneos/App.app build/Payload/
+          cd build
+          zip -r -q Sudoku.ipa Payload
+          echo "IPA 打包完成！大小："
+          ls -lh Sudoku.ipa
+
+      - name: 上傳 IPA 安裝檔產物 (Upload Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sudoku-iOS-App
+          path: build/Sudoku.ipa
+          retention-days: 14

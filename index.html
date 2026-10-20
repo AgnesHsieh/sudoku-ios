@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>數獨 - iOS 原生質感小遊戲 (無廣告)</title>
+  <meta name="description" content="專為 iOS 設計的極致純淨數獨遊戲，零廣告、流暢順滑、多種難度選擇、支援離線遊玩與主畫面安裝。">
+  
+  <!-- iOS PWA & Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="數獨">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="icons/app-icon.jpg">
+  <link rel="icon" type="image/jpeg" href="icons/app-icon.jpg">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/ios-theme.css?v=103">
+  <link rel="stylesheet" href="css/sudoku.css?v=103">
+</head>
+<body>
+  <div class="app-container">
+    <!-- iOS Navigation Bar -->
+    <header class="ios-header">
+      <div class="ios-header-left">
+        <h1 class="ios-title">
+          數獨
+          <span class="ios-title-badge">PRO</span>
+        </h1>
+      </div>
+      <div class="ios-header-right">
+        <button id="btn-stats" class="ios-icon-btn" aria-label="統計數據" title="統計數據">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          </svg>
+        </button>
+        <button id="btn-new-game" class="ios-icon-btn" aria-label="新遊戲" title="新遊戲">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+        <button id="btn-settings" class="ios-icon-btn" aria-label="設定" title="設定">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- iOS Segmented Control (Difficulty Picker) -->
+    <nav class="ios-segmented-control" role="tablist" aria-label="選擇難度">
+      <button class="ios-segment-btn active" data-difficulty="easy" role="tab" id="tab-easy">簡單</button>
+      <button class="ios-segment-btn" data-difficulty="medium" role="tab" id="tab-medium">中等</button>
+      <button class="ios-segment-btn" data-difficulty="hard" role="tab" id="tab-hard">困難</button>
+      <button class="ios-segment-btn" data-difficulty="expert" role="tab" id="tab-expert">大師</button>
+    </nav>
+
+    <!-- Game Viewport -->
+    <main class="game-viewport">
+      <!-- Status Info Bar -->
+      <section class="ios-status-bar">
+        <div class="status-item">
+          <span>難度:</span>
+          <span id="difficulty-display" class="status-value">簡單</span>
+        </div>
+        <div class="status-item">
+          <span id="mistakes-display"><span class="mistake-badge">0</span> 錯誤</span>
+        </div>
+        <div id="pause-btn" class="timer-pill" title="點擊暫停">
+          <svg style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5;" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span id="timer-display" class="status-value">00:00</span>
+        </div>
+      </section>
+
+      <!-- Sudoku 9x9 Board -->
+      <div class="sudoku-board-wrapper">
+        <div id="sudoku-board" class="sudoku-board" aria-label="數獨棋盤"></div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <section class="ios-toolbar" aria-label="操作工具欄">
+        <button id="btn-undo" class="toolbar-btn" aria-label="復原">
+          <div class="btn-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            </svg>
+          </div>
+          <span class="toolbar-btn-label">復原</span>
+        </button>
+
+        <button id="btn-erase" class="toolbar-btn" aria-label="擦除">
+          <div class="btn-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83a1.125 1.125 0 011.59 0l7.98 7.98a1.125 1.125 0 010 1.59l-6.375 6.375a1.125 1.125 0 01-1.59 0z" />
+            </svg>
+          </div>
+          <span class="toolbar-btn-label">擦除</span>
+        </button>
+
+        <button id="btn-notes" class="toolbar-btn" aria-label="鉛筆草稿筆記">
+          <div class="btn-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+            </svg>
+            <span id="notes-badge" class="badge-tag" style="display: none;">ON</span>
+          </div>
+          <span class="toolbar-btn-label">筆記</span>
+        </button>
+
+        <button id="btn-hint" class="toolbar-btn" aria-label="智能提示">
+          <div class="btn-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M12 3c-3.728 0-6.75 3.022-6.75 6.75 0 2.247 1.088 4.238 2.775 5.485.457.338.725.875.725 1.44v.075c0 .414.336.75.75.75h5c.414 0 .75-.336.75-.75v-.075c0-.565.268-1.102.725-1.44A6.732 6.732 0 0018.75 9.75C18.75 6.022 15.728 3 12 3z" />
+            </svg>
+          </div>
+          <span class="toolbar-btn-label">提示</span>
+        </button>
+      </section>
+
+      <!-- Extra Notes Keypad Row (Slides down when notes mode is active) -->
+      <section id="notes-keypad-container" class="notes-keypad-container" aria-label="草稿筆記數字欄">
+        <div class="notes-bar-header">
+          <span class="notes-bar-label">
+            <svg style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2;" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+            </svg>
+            草稿筆記 (候選數)
+          </span>
+          <div class="notes-bar-actions">
+            <button id="btn-auto-notes" class="notes-bar-action" title="自動填入此格所有合法候選數">自動提示</button>
+            <button id="btn-clear-notes" class="notes-bar-action" title="清空此格所有筆記">清空</button>
+          </div>
+        </div>
+        <div class="ios-notes-keypad">
+          <button class="notes-key-btn" data-note="1" id="note-key-1">1</button>
+          <button class="notes-key-btn" data-note="2" id="note-key-2">2</button>
+          <button class="notes-key-btn" data-note="3" id="note-key-3">3</button>
+          <button class="notes-key-btn" data-note="4" id="note-key-4">4</button>
+          <button class="notes-key-btn" data-note="5" id="note-key-5">5</button>
+          <button class="notes-key-btn" data-note="6" id="note-key-6">6</button>
+          <button class="notes-key-btn" data-note="7" id="note-key-7">7</button>
+          <button class="notes-key-btn" data-note="8" id="note-key-8">8</button>
+          <button class="notes-key-btn" data-note="9" id="note-key-9">9</button>
+        </div>
+      </section>
+
+      <!-- Number Pad (1 to 9) -->
+      <section class="ios-keypad" aria-label="數字輸入鍵盤">
+        <button class="keypad-btn" data-num="1" id="key-1">1<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="2" id="key-2">2<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="3" id="key-3">3<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="4" id="key-4">4<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="5" id="key-5">5<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="6" id="key-6">6<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="7" id="key-7">7<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="8" id="key-8">8<span class="keypad-count"></span></button>
+        <button class="keypad-btn" data-num="9" id="key-9">9<span class="keypad-count"></span></button>
+      </section>
+    </main>
+
+    <!-- Modals & Bottom Sheets -->
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="ios-modal-sheet">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-header">
+          <h2 id="settings-title" class="modal-title">遊戲設定</h2>
+          <button class="modal-close-btn" aria-label="關閉">✕</button>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">音效</span>
+              <span class="settings-subtitle">iOS 觸覺與按鍵敲擊音效</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggle-sound">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">震動回饋</span>
+              <span class="settings-subtitle">操作時提供細緻觸覺反饋</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggle-haptics">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">自動標記錯誤</span>
+              <span class="settings-subtitle">即時高亮顯示同行/列/九宮格衝突</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggle-autocheck">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">高亮相同數字</span>
+              <span class="settings-subtitle">點選數字時同時照亮全盤相同數字</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggle-highlight-same">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">3次錯誤上限挑戰</span>
+              <span class="settings-subtitle">達到 3 次失誤即判定失敗</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggle-mistake-limit">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-label">
+              <span class="settings-title">外觀主題</span>
+              <span class="settings-subtitle">支援跟隨 iOS 系統深色模式</span>
+            </div>
+            <select id="theme-select" style="background: var(--ios-gray-5); color: var(--ios-text-primary); border: none; padding: 6px 12px; border-radius: 8px; font-weight: 500; font-size: 14px;">
+              <option value="system">跟隨系統</option>
+              <option value="light">淺色模式</option>
+              <option value="dark">深色模式</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="text-align: center; font-size: 12px; color: var(--ios-text-secondary); margin-top: 10px;">
+          數獨 iOS 純淨版 • 100% 無廣告 • 支援離線遊玩
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="modal-stats" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="stats-diff-title">
+      <div class="ios-modal-sheet">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-header">
+          <h2 id="stats-diff-title" class="modal-title">統計數據</h2>
+          <button class="modal-close-btn" aria-label="關閉">✕</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span id="stat-played" class="stat-big">0</span>
+            <span class="stat-desc">已玩局數</span>
+          </div>
+          <div class="stat-card">
+            <span id="stat-winrate" class="stat-big">0%</span>
+            <span class="stat-desc">勝率</span>
+          </div>
+          <div class="stat-card">
+            <span id="stat-besttime" class="stat-big">--:--</span>
+            <span class="stat-desc">最佳時間</span>
+          </div>
+          <div class="stat-card">
+            <span id="stat-avgtime" class="stat-big">--:--</span>
+            <span class="stat-desc">平均時間</span>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary modal-close-btn" style="width: 100%;">返回遊戲</button>
+      </div>
+    </div>
+
+    <!-- New Game Modal -->
+    <div id="modal-new-game" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="new-game-title">
+      <div class="ios-modal-sheet">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-header">
+          <h2 id="new-game-title" class="modal-title">選擇難度開始新局</h2>
+          <button class="modal-close-btn" aria-label="關閉">✕</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <button class="diff-choice-btn ios-btn-secondary" data-diff="easy" style="text-align: left; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 16px;">簡單</div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 2px;">適合初學者與休閒放鬆</div>
+            </div>
+            <span style="color: var(--ios-green); font-weight: 600;">★☆☆☆</span>
+          </button>
+
+          <button class="diff-choice-btn ios-btn-secondary" data-diff="medium" style="text-align: left; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 16px;">中等</div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 2px;">需要基礎推理技巧</div>
+            </div>
+            <span style="color: var(--ios-blue); font-weight: 600;">★★☆☆</span>
+          </button>
+
+          <button class="diff-choice-btn ios-btn-secondary" data-diff="hard" style="text-align: left; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 16px;">困難</div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 2px;">需要綜合邏輯推理與候選數草稿</div>
+            </div>
+            <span style="color: var(--ios-orange); font-weight: 600;">★★★☆</span>
+          </button>
+
+          <button class="diff-choice-btn ios-btn-secondary" data-diff="expert" style="text-align: left; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 16px;">大師</div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 2px;">極致挑戰，極少預置提示數</div>
+            </div>
+            <span style="color: var(--ios-red); font-weight: 600;">★★★★</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="modal-pause" class="ios-modal-overlay" role="dialog" aria-modal="true">
+      <div class="ios-modal-sheet" style="text-align: center; padding-top: 20px;">
+        <div class="modal-drag-handle"></div>
+        <div style="font-size: 40px; margin-bottom: 12px;">⏸️</div>
+        <h2 class="modal-title" style="margin-bottom: 8px;">遊戲已暫停</h2>
+        <p style="color: var(--ios-text-secondary); font-size: 14px; margin-bottom: 24px;">隨時準備好即可繼續挑戰</p>
+        <button id="btn-resume" class="ios-btn-primary">繼續遊戲</button>
+      </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="modal-win" class="ios-modal-overlay" role="dialog" aria-modal="true">
+      <div class="ios-modal-sheet win-modal-content">
+        <div class="win-icon-wrapper">
+          <svg style="width: 40px; height: 40px; stroke: currentColor; fill: none; stroke-width: 2.5;" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">恭喜通關！</h2>
+        <div id="win-diff-label" style="font-size: 13px; color: var(--ios-text-secondary); font-weight: 600;">簡單難度</div>
+
+        <div class="win-time-text" id="win-time-val">00:00</div>
+
+        <div class="stats-grid" style="margin: 18px 0;">
+          <div class="stat-card">
+            <span id="win-best-val" class="stat-big">--:--</span>
+            <span class="stat-desc">最佳紀錄</span>
+          </div>
+          <div class="stat-card">
+            <span id="win-mistakes-val" class="stat-big">0</span>
+            <span class="stat-desc">失誤次數</span>
+          </div>
+        </div>
+
+        <button id="btn-win-next" class="ios-btn-primary">開始下一局</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Service Worker Registration for Complete Offline PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            console.log('✓ 離線快取已就緒，支援無網路遊玩');
+          })
+          .catch(err => {
+            console.log('Service Worker 註冊跳過:', err);
+          });
+      });
+    }
+  </script>
+
+  <!-- Application Scripts -->
+  <script src="js/sudoku-engine.js?v=105"></script>
+  <script src="js/audio.js?v=105"></script>
+  <script src="js/game.js?v=105"></script>
+  <script src="js/app.js?v=105"></script>
+</body>
+</html>
