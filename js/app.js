@@ -55,6 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewOverview = document.getElementById('view-overview');
   const btnClearLb = document.getElementById('btn-clear-lb');
 
+  // Pause Feature Elements
+  const boardPauseOverlay = document.getElementById('board-pause-overlay');
+  const btnBoardResume = document.getElementById('btn-board-resume');
+  const pauseBtnIcon = document.getElementById('pause-btn-icon');
+  const pauseTextTag = document.getElementById('pause-text-tag');
+  const pauseDiffVal = document.getElementById('pause-diff-val');
+  const pauseTimeVal = document.getElementById('pause-time-val');
+  const pauseMistakesVal = document.getElementById('pause-mistakes-val');
+  const btnPauseNewgame = document.getElementById('btn-pause-newgame');
+
   let activeLbDiff = 'easy';
   let activeOverviewDiff = 'easy';
 
@@ -319,19 +329,82 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Pause Button
-  pauseBtn.addEventListener('click', () => {
-    game.togglePause();
-    if (game.isPaused) {
+  // Centralized Pause & Resume Control
+  function updatePauseUI() {
+    const isPaused = game.isPaused;
+    const diffNames = { easy: '簡單', medium: '中等', hard: '困難', expert: '大師' };
+
+    if (isPaused) {
+      if (boardPauseOverlay) boardPauseOverlay.style.display = 'flex';
+      if (pauseBtnIcon) {
+        pauseBtnIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        `;
+      }
+      if (pauseTextTag) pauseTextTag.textContent = '繼續';
+
+      if (pauseDiffVal) pauseDiffVal.textContent = diffNames[game.difficulty] || '簡單';
+      if (pauseTimeVal) pauseTimeVal.textContent = formatDuration(game.timerSeconds);
+      if (pauseMistakesVal) pauseMistakesVal.textContent = game.mistakes;
+
       openModal(modalPause);
     } else {
+      if (boardPauseOverlay) boardPauseOverlay.style.display = 'none';
+      if (pauseBtnIcon) {
+        pauseBtnIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+          </svg>
+        `;
+      }
+      if (pauseTextTag) pauseTextTag.textContent = '暫停';
+
       closeModal(modalPause);
     }
+  }
+
+  function pauseGame() {
+    if (game.isComplete || game.isGameOver) return;
+    game.pauseGame();
+    updatePauseUI();
+  }
+
+  function resumeGame() {
+    game.resumeGame();
+    updatePauseUI();
+  }
+
+  pauseBtn.addEventListener('click', () => {
+    if (game.isPaused) resumeGame();
+    else pauseGame();
   });
 
   document.getElementById('btn-resume')?.addEventListener('click', () => {
-    game.resumeGame();
-    closeModal(modalPause);
+    resumeGame();
+  });
+
+  btnBoardResume?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resumeGame();
+  });
+
+  boardPauseOverlay?.addEventListener('click', () => {
+    resumeGame();
+  });
+
+  btnPauseNewgame?.addEventListener('click', () => {
+    resumeGame();
+    currentSelectedDiff = game.difficulty;
+    openModal(modalNewGame);
+  });
+
+  // Auto-pause when user leaves the app or switches tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && !game.isPaused && !game.isComplete && !game.isGameOver) {
+      pauseGame();
+    }
   });
 
   // Keyboard Shortcuts Support
@@ -367,10 +440,10 @@ document.addEventListener('DOMContentLoaded', () => {
       game.undo();
     }
     // Pause 'p' or Space
-    else if (e.key === 'p' || e.key === 'P') {
-      game.togglePause();
-      if (game.isPaused) openModal(modalPause);
-      else closeModal(modalPause);
+    else if (e.key === 'p' || e.key === 'P' || e.key === ' ') {
+      e.preventDefault();
+      if (game.isPaused) resumeGame();
+      else pauseGame();
     }
     // Restart 'r' or 'R'
     else if (e.key === 'r' || e.key === 'R') {
@@ -410,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modal) {
         closeModal(modal);
         if (modal === modalPause && game.isPaused) {
-          game.resumeGame();
+          resumeGame();
         }
       }
     });
@@ -422,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === overlay) {
         closeModal(overlay);
         if (overlay === modalPause && game.isPaused) {
-          game.resumeGame();
+          resumeGame();
         }
       }
     });
@@ -461,6 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnConfirmRestart?.addEventListener('click', () => {
     closeModal(modalConfirmRestart);
     clearConfetti();
+    resumeGame();
     game.restartCurrentGame();
     renderBoard();
     updateTimerDisplay(0);

@@ -74,17 +74,32 @@
         <div class="status-item">
           <span id="mistakes-display"><span class="mistake-badge">0</span> 錯誤</span>
         </div>
-        <div id="pause-btn" class="timer-pill" title="點擊暫停">
-          <svg style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5;" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+        <button id="pause-btn" class="timer-pill pause-interactive" aria-label="暫停遊戲" title="點擊暫停遊戲">
+          <span id="pause-btn-icon" class="pause-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+          </span>
           <span id="timer-display" class="status-value">00:00</span>
-        </div>
+          <span id="pause-text-tag" class="pause-text-tag">暫停</span>
+        </button>
       </section>
 
       <!-- Sudoku 9x9 Board -->
       <div class="sudoku-board-wrapper">
         <div id="sudoku-board" class="sudoku-board" aria-label="數獨棋盤"></div>
+        <!-- Board Privacy / Pause Frosted Glass Overlay -->
+        <div id="board-pause-overlay" class="board-pause-overlay" style="display: none;">
+          <div class="pause-overlay-card">
+            <button id="btn-board-resume" class="pause-play-btn" aria-label="繼續遊戲" title="點擊繼續挑戰">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+            <div class="pause-overlay-title">遊戲已暫停</div>
+            <div class="pause-overlay-sub">點擊任意處繼續挑戰</div>
+          </div>
+        </div>
       </div>
 
       <!-- Action Toolbar -->
@@ -398,15 +413,42 @@
     </div>
 
     <!-- Pause Modal -->
-    <div id="modal-pause" class="ios-modal-overlay" role="dialog" aria-modal="true">
-      <div class="ios-modal-sheet" style="text-align: center; padding-top: 20px;">
+    <div id="modal-pause" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-modal-title">
+      <div class="ios-modal-sheet" style="text-align: center; max-width: 380px;">
         <div class="modal-drag-handle"></div>
-        <div style="font-size: 40px; margin-bottom: 12px;">⏸️</div>
-        <h2 class="modal-title" style="margin-bottom: 8px;">遊戲已暫停</h2>
-        <p style="color: var(--ios-text-secondary); font-size: 14px; margin-bottom: 24px;">隨時準備好即可繼續挑戰</p>
+        <div class="pause-modal-badge">
+          <svg style="width: 30px; height: 30px; fill: currentColor;" viewBox="0 0 24 24">
+            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+          </svg>
+        </div>
+        <h2 id="pause-modal-title" class="modal-title" style="margin-bottom: 6px;">遊戲已暫停</h2>
+        <p style="color: var(--ios-text-secondary); font-size: 14px; margin-bottom: 16px;">隨時準備好即可繼續挑戰</p>
+
+        <!-- Current Game Mini Status -->
+        <div class="pause-status-summary" style="display: flex; justify-content: space-around; background: var(--ios-card-bg-elevated); padding: 12px 16px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--ios-separator);">
+          <div>
+            <div style="font-size: 11px; color: var(--ios-text-secondary);">難度</div>
+            <div id="pause-diff-val" style="font-weight: 700; font-size: 15px; margin-top: 2px;">簡單</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--ios-text-secondary);">已用時間</div>
+            <div id="pause-time-val" style="font-weight: 700; font-size: 15px; color: var(--ios-blue); margin-top: 2px; font-variant-numeric: tabular-nums;">00:00</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--ios-text-secondary);">失誤</div>
+            <div id="pause-mistakes-val" style="font-weight: 700; font-size: 15px; margin-top: 2px;">0</div>
+          </div>
+        </div>
+
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-          <button id="btn-resume" class="ios-btn-primary">繼續遊戲</button>
+          <button id="btn-resume" class="ios-btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <span>繼續遊戲</span>
+          </button>
           <button id="btn-pause-restart" class="ios-btn-secondary" style="width: 100%;">🔄 重來本局</button>
+          <button id="btn-pause-newgame" class="ios-btn-secondary" style="width: 100%;">➕ 選擇難度開始新局</button>
         </div>
       </div>
     </div>

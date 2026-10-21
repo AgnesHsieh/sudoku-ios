@@ -13,6 +13,7 @@
 
 /* 9x9 Sudoku Board Container */
 .sudoku-board-wrapper {
+  position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
   max-width: 480px;
@@ -776,4 +777,139 @@ input:checked + .slider:before {
   margin: 4px auto 10px auto;
   box-shadow: 0 4px 14px rgba(255, 149, 0, 0.4);
   animation: win-bounce 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+   Pause Feature, Privacy Overlay & Controls
+   ========================================================================== */
+.timer-pill.pause-interactive {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ios-card-bg);
+  border: 1px solid var(--ios-separator);
+  padding: 5px 12px;
+  border-radius: 16px;
+  box-shadow: var(--ios-shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.timer-pill.pause-interactive:hover {
+  border-color: var(--ios-blue);
+  background: var(--ios-card-bg-elevated);
+}
+
+.timer-pill.pause-interactive:active {
+  transform: scale(0.95);
+}
+
+.pause-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ios-blue);
+  width: 14px;
+  height: 14px;
+}
+
+.pause-icon-wrapper svg {
+  width: 14px;
+  height: 14px;
+}
+
+.pause-text-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ios-blue);
+  background: rgba(0, 122, 255, 0.12);
+  padding: 2px 7px;
+  border-radius: 8px;
+  letter-spacing: 0.2px;
+}
+
+/* Sudoku Board Frosted Glass Pause Overlay */
+.board-pause-overlay {
+  position: absolute;
+  inset: 4px;
+  background: rgba(242, 242, 247, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  cursor: pointer;
+  animation: fadeIn 0.2s ease;
+}
+
+[data-theme="dark"] .board-pause-overlay {
+  background: rgba(28, 28, 30, 0.82);
+}
+
+.pause-overlay-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+
+.pause-play-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007AFF, #0051D5);
+  color: #FFFFFF;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.45);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pause-play-btn svg {
+  width: 32px;
+  height: 32px;
+  margin-left: 4px; /* visually center the triangle */
+}
+
+.pause-play-btn:active {
+  transform: scale(0.92);
+}
+
+.pause-overlay-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ios-text-primary);
+  letter-spacing: -0.3px;
+}
+
+.pause-overlay-sub {
+  font-size: 13px;
+  color: var(--ios-text-secondary);
+  font-weight: 500;
+}
+
+/* Pause Modal Specifics */
+.pause-modal-badge {
+  width: 64px;
+  height: 64px;
+  margin: 4px auto 14px auto;
+  border-radius: 50%;
+  background: rgba(0, 122, 255, 0.12);
+  color: var(--ios-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
