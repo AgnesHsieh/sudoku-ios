@@ -26,6 +26,7 @@ class SudokuGame {
 
     this.settings = this.loadSettings();
     this.stats = this.loadStats();
+    this.leaderboard = this.loadLeaderboard();
 
     // Apply sound settings
     this.sound.soundEnabled = this.settings.soundEnabled;
@@ -80,6 +81,65 @@ class SudokuGame {
     try {
       localStorage.setItem('sudoku_stats', JSON.stringify(this.stats));
     } catch (e) {}
+  }
+
+  // Load leaderboard from localStorage
+  loadLeaderboard() {
+    const defaultLb = {
+      easy: [],
+      medium: [],
+      hard: [],
+      expert: []
+    };
+    try {
+      const saved = localStorage.getItem('sudoku_leaderboard');
+      return saved ? { ...defaultLb, ...JSON.parse(saved) } : defaultLb;
+    } catch (e) {
+      return defaultLb;
+    }
+  }
+
+  saveLeaderboard() {
+    try {
+      localStorage.setItem('sudoku_leaderboard', JSON.stringify(this.leaderboard));
+    } catch (e) {}
+  }
+
+  // Clear leaderboard records
+  clearLeaderboard(difficulty = null) {
+    if (difficulty && this.leaderboard[difficulty]) {
+      this.leaderboard[difficulty] = [];
+    } else {
+      this.leaderboard = { easy: [], medium: [], hard: [], expert: [] };
+    }
+    this.saveLeaderboard();
+  }
+
+  // Restart the current puzzle from scratch (Reset)
+  restartCurrentGame() {
+    if (!this.initialBoard) return;
+    this.stopTimer();
+
+    this.currentBoard = this.engine.cloneGrid(this.initialBoard);
+    this.notes = Array.from({ length: 9 }, () =>
+      Array.from({ length: 9 }, () => new Set())
+    );
+
+    this.selectedCell = null;
+    this.history = [];
+    this.mistakes = 0;
+    this.hintsUsed = 0;
+    this.timerSeconds = 0;
+    this.isNotesMode = false;
+    this.isPaused = false;
+    this.isGameOver = false;
+    this.isComplete = false;
+
+    this.sound.playErase();
+    this.startTimer();
+    this.saveCurrentGame();
+    if (this.onStateChange) this.onStateChange();
+    if (this.onTimerTick) this.onTimerTick(0);
   }
 
   // Initialize a new game
@@ -511,23 +571,56 @@ class SudokuGame {
     this.sound.playVictory();
 
     // Update stats
+    let isNewBest = false;
     const diffStats = this.stats[this.difficulty];
     if (diffStats) {
       diffStats.won++;
       diffStats.totalTime += this.timerSeconds;
       if (!diffStats.bestTime || this.timerSeconds < diffStats.bestTime) {
         diffStats.bestTime = this.timerSeconds;
+        isNewBest = true;
       }
       this.saveStats();
     }
+
+    // Record into Leaderboard (Top 10)
+    const now = new Date();
+    const dateFormatted = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const newEntry = {
+      id: Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      time: this.timerSeconds,
+      date: dateFormatted,
+      timestamp: Date.now(),
+      mistakes: this.mistakes,
+      hintsUsed: this.hintsUsed
+    };
+
+    if (!this.leaderboard[this.difficulty]) {
+      this.leaderboard[this.difficulty] = [];
+    }
+    const list = this.leaderboard[this.difficulty];
+    list.push(newEntry);
+    list.sort((a, b) => {
+      if (a.time !== b.time) return a.time - b.time;
+      if (a.mistakes !== b.mistakes) return a.mistakes - b.mistakes;
+      return a.hintsUsed - b.hintsUsed;
+    });
+
+    const rank = list.findIndex(item => item.id === newEntry.id) + 1;
+    if (list.length > 10) {
+      this.leaderboard[this.difficulty] = list.slice(0, 10);
+    }
+    this.saveLeaderboard();
 
     if (this.onGameWon) {
       this.onGameWon({
         difficulty: this.difficulty,
         time: this.timerSeconds,
-        bestTime: this.stats[this.difficulty].bestTime,
+        bestTime: this.stats[this.difficulty] ? this.stats[this.difficulty].bestTime : this.timerSeconds,
         mistakes: this.mistakes,
-        hintsUsed: this.hintsUsed
+        hintsUsed: this.hintsUsed,
+        rank: rank <= 10 ? rank : null,
+        isNewBest: isNewBest || rank === 1
       });
     }
 

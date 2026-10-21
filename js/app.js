@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Header Buttons & Modals
   const btnSettings = document.getElementById('btn-settings');
   const btnStats = document.getElementById('btn-stats');
+  const btnRestart = document.getElementById('btn-restart');
   const btnNewGame = document.getElementById('btn-new-game');
 
   const modalSettings = document.getElementById('modal-settings');
@@ -39,6 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalNewGame = document.getElementById('modal-new-game');
   const modalWin = document.getElementById('modal-win');
   const modalPause = document.getElementById('modal-pause');
+  const modalConfirmRestart = document.getElementById('modal-confirm-restart');
+
+  const btnConfirmRestart = document.getElementById('btn-confirm-restart');
+  const btnCancelRestart = document.getElementById('btn-cancel-restart');
+  const btnPauseRestart = document.getElementById('btn-pause-restart');
+  const btnNewGameRestart = document.getElementById('btn-newgame-restart');
+  const btnWinViewLb = document.getElementById('btn-win-view-lb');
+
+  // Leaderboard & Stats Tab Switcher
+  const tabViewLeaderboard = document.getElementById('tab-view-leaderboard');
+  const tabViewOverview = document.getElementById('tab-view-overview');
+  const viewLeaderboard = document.getElementById('view-leaderboard');
+  const viewOverview = document.getElementById('view-overview');
+  const btnClearLb = document.getElementById('btn-clear-lb');
+
+  let activeLbDiff = 'easy';
+  let activeOverviewDiff = 'easy';
 
   const closeButtons = document.querySelectorAll('.modal-close-btn');
 
@@ -354,6 +372,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (game.isPaused) openModal(modalPause);
       else closeModal(modalPause);
     }
+    // Restart 'r' or 'R'
+    else if (e.key === 'r' || e.key === 'R') {
+      askRestartCurrentGame();
+    }
     // Arrow Navigation
     else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       e.preventDefault();
@@ -411,10 +433,37 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal(modalSettings);
   });
 
-  // Stats Modal
+  // Stats & Leaderboard Modal
   btnStats.addEventListener('click', () => {
     populateStatsModal();
     openModal(modalStats);
+  });
+
+  // Restart Handlers
+  function askRestartCurrentGame() {
+    if (game.isPaused) {
+      closeModal(modalPause);
+    }
+    if (modalNewGame.classList.contains('active')) {
+      closeModal(modalNewGame);
+    }
+    openModal(modalConfirmRestart);
+  }
+
+  btnRestart?.addEventListener('click', askRestartCurrentGame);
+  btnPauseRestart?.addEventListener('click', askRestartCurrentGame);
+  btnNewGameRestart?.addEventListener('click', askRestartCurrentGame);
+
+  btnCancelRestart?.addEventListener('click', () => {
+    closeModal(modalConfirmRestart);
+  });
+
+  btnConfirmRestart?.addEventListener('click', () => {
+    closeModal(modalConfirmRestart);
+    clearConfetti();
+    game.restartCurrentGame();
+    renderBoard();
+    updateTimerDisplay(0);
   });
 
   // New Game Modal
@@ -499,19 +548,111 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* -------------------------------------------------------------
-     STATISTICS MODAL
+     STATISTICS & LEADERBOARD MODAL
   ------------------------------------------------------------- */
-  function populateStatsModal() {
-    const diff = game.difficulty;
+  // Tab Switcher (Leaderboard vs Overview)
+  tabViewLeaderboard?.addEventListener('click', () => {
+    tabViewLeaderboard.classList.add('active');
+    tabViewOverview.classList.remove('active');
+    viewLeaderboard.style.display = 'flex';
+    viewOverview.style.display = 'none';
+    renderLeaderboard(activeLbDiff);
+  });
+
+  tabViewOverview?.addEventListener('click', () => {
+    tabViewOverview.classList.add('active');
+    tabViewLeaderboard.classList.remove('active');
+    viewLeaderboard.style.display = 'none';
+    viewOverview.style.display = 'flex';
+    populateOverviewStats(activeOverviewDiff);
+  });
+
+  // Difficulty Buttons in Leaderboard Tab
+  document.querySelectorAll('.lb-diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lb-diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeLbDiff = btn.dataset.diff;
+      renderLeaderboard(activeLbDiff);
+    });
+  });
+
+  // Difficulty Buttons in Overview Tab
+  document.querySelectorAll('.overview-diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.overview-diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeOverviewDiff = btn.dataset.diff;
+      populateOverviewStats(activeOverviewDiff);
+    });
+  });
+
+  // Clear Leaderboard
+  btnClearLb?.addEventListener('click', () => {
+    const diffNames = { easy: '簡單', medium: '中等', hard: '困難', expert: '大師' };
+    if (confirm(`確定要清空「${diffNames[activeLbDiff]}」難度的所有排行紀錄嗎？`)) {
+      game.clearLeaderboard(activeLbDiff);
+      renderLeaderboard(activeLbDiff);
+    }
+  });
+
+  function renderLeaderboard(diff = activeLbDiff) {
+    activeLbDiff = diff;
+    document.querySelectorAll('.lb-diff-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.diff === diff);
+    });
+
+    const container = document.getElementById('leaderboard-items-container');
+    if (!container) return;
+
+    const records = (game.leaderboard && game.leaderboard[diff]) ? game.leaderboard[diff] : [];
+    if (records.length === 0) {
+      container.innerHTML = `
+        <div class="leaderboard-empty">
+          <div class="leaderboard-empty-icon">🏆</div>
+          <div class="leaderboard-empty-title">尚無排行紀錄</div>
+          <div class="leaderboard-empty-desc">完成一局數獨挑戰，即可榮登本難度 Top 10 最佳排行榜！</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = records.map((entry, index) => {
+      const rank = index + 1;
+      const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+      const medalIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const mistakesText = entry.mistakes === 0 ? '0 失誤' : `${entry.mistakes} 失誤`;
+      const hintsText = entry.hintsUsed === 0 ? '0 提示' : `${entry.hintsUsed} 提示`;
+      const isFlawless = entry.mistakes === 0 && entry.hintsUsed === 0;
+
+      return `
+        <div class="leaderboard-item ${rankClass}">
+          <div class="lb-left">
+            <div class="lb-rank-badge">${medalIcon}</div>
+            <div class="lb-info">
+              <div class="lb-time">${formatDuration(entry.time)}</div>
+              <div class="lb-meta">
+                <span>${entry.date || '剛剛'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="lb-tags">
+            ${isFlawless ? '<span class="lb-tag flawless">完美通關</span>' : ''}
+            <span class="lb-tag">${mistakesText}</span>
+            <span class="lb-tag">${hintsText}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function populateOverviewStats(diff = activeOverviewDiff) {
+    activeOverviewDiff = diff;
+    document.querySelectorAll('.overview-diff-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.diff === diff);
+    });
+
     const stats = game.stats[diff] || { played: 0, won: 0, bestTime: null, totalTime: 0 };
-
-    document.getElementById('stats-diff-title').textContent = {
-      easy: '簡單難度統計',
-      medium: '中等難度統計',
-      hard: '困難難度統計',
-      expert: '大師難度統計'
-    }[diff];
-
     document.getElementById('stat-played').textContent = stats.played;
     const winRate = stats.played > 0 ? Math.round((stats.won / stats.played) * 100) : 0;
     document.getElementById('stat-winrate').textContent = `${winRate}%`;
@@ -521,6 +662,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const avgTimeSec = stats.won > 0 ? Math.round(stats.totalTime / stats.won) : 0;
     document.getElementById('stat-avgtime').textContent = avgTimeSec > 0 ? formatDuration(avgTimeSec) : '--:--';
+  }
+
+  function populateStatsModal() {
+    activeLbDiff = game.difficulty;
+    activeOverviewDiff = game.difficulty;
+    renderLeaderboard(activeLbDiff);
+    populateOverviewStats(activeOverviewDiff);
   }
 
   function formatDuration(sec) {
@@ -539,9 +687,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('win-best-val').textContent = formatDuration(data.bestTime);
     document.getElementById('win-mistakes-val').textContent = data.mistakes;
 
+    const rankBadge = document.getElementById('win-rank-badge');
+    const rankNum = document.getElementById('win-rank-num');
+    if (data.rank && data.rank <= 10) {
+      rankNum.textContent = data.rank;
+      rankBadge.style.display = 'inline-block';
+    } else {
+      rankBadge.style.display = 'none';
+    }
+
     openModal(modalWin);
     launchConfetti();
   }
+
+  document.getElementById('btn-win-view-lb')?.addEventListener('click', () => {
+    closeModal(modalWin);
+    clearConfetti();
+    tabViewLeaderboard.click();
+    activeLbDiff = game.difficulty;
+    renderLeaderboard(activeLbDiff);
+    openModal(modalStats);
+  });
 
   function clearConfetti() {
     const canvas = document.getElementById('confetti-canvas');

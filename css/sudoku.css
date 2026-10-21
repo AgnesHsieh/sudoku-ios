@@ -532,3 +532,248 @@ input:checked + .slider:before {
   pointer-events: none;
   z-index: 9999;
 }
+
+/* ==========================================================================
+   Destructive Button & Action Sheets
+   ========================================================================== */
+.ios-btn-destructive {
+  background: var(--ios-red);
+  color: #FFFFFF;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 4px 14px rgba(255, 59, 48, 0.35);
+}
+
+.ios-btn-destructive:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   Leaderboard & Tabs Styles
+   ========================================================================== */
+.stats-tab-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-tab-content.active {
+  display: flex;
+}
+
+/* Difficulty Sub-bar in Modals */
+.leaderboard-diff-picker {
+  display: flex;
+  gap: 6px;
+  background: var(--ios-gray-5);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.lb-diff-btn,
+.overview-diff-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 6px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lb-diff-btn.active,
+.overview-diff-btn.active {
+  background: var(--ios-card-bg-elevated);
+  color: var(--ios-blue);
+  box-shadow: var(--ios-shadow-sm);
+}
+
+/* Leaderboard List */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 160px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--ios-card-bg-elevated);
+  border: 1px solid var(--ios-separator);
+  transition: transform 0.1s ease;
+}
+
+/* Top 3 Medals Glow & Colors */
+.leaderboard-item.rank-1 {
+  border: 1.5px solid rgba(255, 215, 0, 0.65);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), var(--ios-card-bg-elevated));
+  box-shadow: 0 3px 12px rgba(255, 215, 0, 0.18);
+}
+
+.leaderboard-item.rank-2 {
+  border: 1.5px solid rgba(192, 192, 192, 0.6);
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), var(--ios-card-bg-elevated));
+}
+
+.leaderboard-item.rank-3 {
+  border: 1.5px solid rgba(205, 127, 50, 0.55);
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--ios-card-bg-elevated));
+}
+
+.lb-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lb-rank-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  background: var(--ios-gray-5);
+  color: var(--ios-text-secondary);
+  flex-shrink: 0;
+}
+
+.leaderboard-item.rank-1 .lb-rank-badge {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000000;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-item.rank-2 .lb-rank-badge {
+  background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+  color: #212121;
+}
+
+.leaderboard-item.rank-3 .lb-rank-badge {
+  background: linear-gradient(135deg, #E6A15C, #CD7F32);
+  color: #FFFFFF;
+}
+
+.lb-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lb-time {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ios-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+.leaderboard-item.rank-1 .lb-time {
+  color: #D48800;
+}
+
+[data-theme="dark"] .leaderboard-item.rank-1 .lb-time {
+  color: #FFD700;
+}
+
+.lb-meta {
+  font-size: 11px;
+  color: var(--ios-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lb-tags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lb-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--ios-gray-5);
+  color: var(--ios-text-secondary);
+  font-weight: 500;
+}
+
+.lb-tag.flawless {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--ios-green);
+  font-weight: 600;
+}
+
+/* Empty State */
+.leaderboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 16px;
+  color: var(--ios-text-secondary);
+}
+
+.leaderboard-empty-icon {
+  font-size: 42px;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.leaderboard-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ios-text-primary);
+  margin-bottom: 4px;
+}
+
+.leaderboard-empty-desc {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Subtle Clear Button */
+.btn-clear-subtle {
+  background: none;
+  border: none;
+  color: var(--ios-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.btn-clear-subtle:hover {
+  color: var(--ios-red);
+}
+
+/* Win Rank Badge */
+.win-rank-badge {
+  background: linear-gradient(135deg, #FFD700, #FF9500);
+  color: #000000;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin: 4px auto 10px auto;
+  box-shadow: 0 4px 14px rgba(255, 149, 0, 0.4);
+  animation: win-bounce 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}

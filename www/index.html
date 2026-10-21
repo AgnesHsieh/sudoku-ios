@@ -31,9 +31,14 @@
         </h1>
       </div>
       <div class="ios-header-right">
-        <button id="btn-stats" class="ios-icon-btn" aria-label="統計數據" title="統計數據">
+        <button id="btn-stats" class="ios-icon-btn" aria-label="成績排行與統計" title="成績排行與統計">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-6.75a1.125 1.125 0 01-1.125 1.125v3.375m9 0h-9m10.5-12.75l-1.5 6a3.75 3.75 0 01-3.64 2.875h-4.72A3.75 3.75 0 014.5 12l-1.5-6H21z" />
+          </svg>
+        </button>
+        <button id="btn-restart" class="ios-icon-btn" aria-label="重來本局" title="重來本局">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
           </svg>
         </button>
         <button id="btn-new-game" class="ios-icon-btn" aria-label="新遊戲" title="新遊戲">
@@ -249,35 +254,91 @@
       </div>
     </div>
 
-    <!-- Stats Modal -->
-    <div id="modal-stats" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="stats-diff-title">
-      <div class="ios-modal-sheet">
+    <!-- Stats & Leaderboard Modal -->
+    <div id="modal-stats" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="stats-sheet-title">
+      <div class="ios-modal-sheet" style="max-height: 85vh; display: flex; flex-direction: column;">
         <div class="modal-drag-handle"></div>
-        <div class="modal-header">
-          <h2 id="stats-diff-title" class="modal-title">統計數據</h2>
+        <div class="modal-header" style="margin-bottom: 12px;">
+          <h2 id="stats-sheet-title" class="modal-title">成績排行與統計</h2>
           <button class="modal-close-btn" aria-label="關閉">✕</button>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span id="stat-played" class="stat-big">0</span>
-            <span class="stat-desc">已玩局數</span>
+        <!-- Segmented Tab Switcher (Leaderboard vs Overview) -->
+        <div class="ios-segmented-control" style="margin-bottom: 14px;" role="tablist">
+          <button id="tab-view-leaderboard" class="ios-segment-btn active" role="tab">🏆 成績排行</button>
+          <button id="tab-view-overview" class="ios-segment-btn" role="tab">📊 概況統計</button>
+        </div>
+
+        <!-- View 1: Leaderboard -->
+        <div id="view-leaderboard" class="stats-tab-content active" style="flex: 1; overflow-y: auto; padding-right: 2px;">
+          <!-- Difficulty Sub-bar -->
+          <div class="leaderboard-diff-picker">
+            <button class="lb-diff-btn active" data-diff="easy">簡單</button>
+            <button class="lb-diff-btn" data-diff="medium">中等</button>
+            <button class="lb-diff-btn" data-diff="hard">困難</button>
+            <button class="lb-diff-btn" data-diff="expert">大師</button>
           </div>
-          <div class="stat-card">
-            <span id="stat-winrate" class="stat-big">0%</span>
-            <span class="stat-desc">勝率</span>
+
+          <!-- Dynamic Leaderboard Items -->
+          <div id="leaderboard-items-container" class="leaderboard-list">
+            <!-- Dynamically populated via JS -->
           </div>
-          <div class="stat-card">
-            <span id="stat-besttime" class="stat-big">--:--</span>
-            <span class="stat-desc">最佳時間</span>
-          </div>
-          <div class="stat-card">
-            <span id="stat-avgtime" class="stat-big">--:--</span>
-            <span class="stat-desc">平均時間</span>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+            <button id="btn-clear-lb" class="btn-clear-subtle">清空此難度排行紀錄</button>
           </div>
         </div>
 
-        <button class="ios-btn-primary modal-close-btn" style="width: 100%;">返回遊戲</button>
+        <!-- View 2: Overview Stats -->
+        <div id="view-overview" class="stats-tab-content" style="display: none;">
+          <div class="leaderboard-diff-picker" style="margin-bottom: 14px;">
+            <button class="overview-diff-btn active" data-diff="easy">簡單</button>
+            <button class="overview-diff-btn" data-diff="medium">中等</button>
+            <button class="overview-diff-btn" data-diff="hard">困難</button>
+            <button class="overview-diff-btn" data-diff="expert">大師</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span id="stat-played" class="stat-big">0</span>
+              <span class="stat-desc">已玩局數</span>
+            </div>
+            <div class="stat-card">
+              <span id="stat-winrate" class="stat-big">0%</span>
+              <span class="stat-desc">勝率</span>
+            </div>
+            <div class="stat-card">
+              <span id="stat-besttime" class="stat-big">--:--</span>
+              <span class="stat-desc">最佳時間</span>
+            </div>
+            <div class="stat-card">
+              <span id="stat-avgtime" class="stat-big">--:--</span>
+              <span class="stat-desc">平均時間</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary modal-close-btn" style="width: 100%; margin-top: 14px;">返回遊戲</button>
+      </div>
+    </div>
+
+    <!-- Confirm Restart Modal (iOS Action Sheet) -->
+    <div id="modal-confirm-restart" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="restart-title">
+      <div class="ios-modal-sheet" style="text-align: center; max-width: 380px;">
+        <div class="modal-drag-handle"></div>
+        <div style="width: 54px; height: 54px; margin: 4px auto 12px auto; border-radius: 50%; background: rgba(255, 59, 48, 0.12); display: flex; align-items: center; justify-content: center; color: var(--ios-red);">
+          <svg style="width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 2.2;" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </div>
+        <h2 id="restart-title" class="modal-title" style="margin-bottom: 8px;">確定重來本局？</h2>
+        <p style="color: var(--ios-text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 22px;">
+          將清空本局填入的所有數字與筆記草稿，計時器將重置為 00:00，重新挑戰同一道題目。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="btn-confirm-restart" class="ios-btn-destructive" style="width: 100%;">重新開始</button>
+          <button id="btn-cancel-restart" class="ios-btn-secondary" style="width: 100%;">取消</button>
+        </div>
       </div>
     </div>
 
@@ -288,6 +349,16 @@
         <div class="modal-header">
           <h2 id="new-game-title" class="modal-title">選擇難度開始新局</h2>
           <button class="modal-close-btn" aria-label="關閉">✕</button>
+        </div>
+
+        <!-- Restart current game button inside new game modal -->
+        <div style="margin-bottom: 14px;">
+          <button id="btn-newgame-restart" class="ios-btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; padding: 13px; border-radius: 12px;">
+            <svg style="width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2;" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            <span>重來目前這局</span>
+          </button>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
@@ -333,7 +404,10 @@
         <div style="font-size: 40px; margin-bottom: 12px;">⏸️</div>
         <h2 class="modal-title" style="margin-bottom: 8px;">遊戲已暫停</h2>
         <p style="color: var(--ios-text-secondary); font-size: 14px; margin-bottom: 24px;">隨時準備好即可繼續挑戰</p>
-        <button id="btn-resume" class="ios-btn-primary">繼續遊戲</button>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <button id="btn-resume" class="ios-btn-primary">繼續遊戲</button>
+          <button id="btn-pause-restart" class="ios-btn-secondary" style="width: 100%;">🔄 重來本局</button>
+        </div>
       </div>
     </div>
 
@@ -348,6 +422,11 @@
         <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">恭喜通關！</h2>
         <div id="win-diff-label" style="font-size: 13px; color: var(--ios-text-secondary); font-weight: 600;">簡單難度</div>
 
+        <!-- Rank Achievement Badge -->
+        <div id="win-rank-badge" class="win-rank-badge" style="display: none;">
+          🏆 榮登排行榜第 <span id="win-rank-num">1</span> 名！
+        </div>
+
         <div class="win-time-text" id="win-time-val">00:00</div>
 
         <div class="stats-grid" style="margin: 18px 0;">
@@ -361,7 +440,10 @@
           </div>
         </div>
 
-        <button id="btn-win-next" class="ios-btn-primary">開始下一局</button>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <button id="btn-win-next" class="ios-btn-primary">開始下一局</button>
+          <button id="btn-win-view-lb" class="ios-btn-secondary" style="width: 100%;">🏆 查看成績排行</button>
+        </div>
       </div>
     </div>
   </div>
