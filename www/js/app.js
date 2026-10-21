@@ -76,10 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleAutoCheck = document.getElementById('toggle-autocheck');
   const toggleHighlightSame = document.getElementById('toggle-highlight-same');
   const toggleMistakeLimit = document.getElementById('toggle-mistake-limit');
-  const themeSelect = document.getElementById('theme-select');
+
+  // Appearance & Theme Mode Elements
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
+  const themeIconSun = document.getElementById('theme-icon-sun');
+  const themeIconMoon = document.getElementById('theme-icon-moon');
+  const themeCards = document.querySelectorAll('.theme-card-btn');
 
   // Initialize UI & Settings
-  applyTheme(game.settings.theme);
+  applyTheme(game.settings.theme || 'system');
   syncSettingsUI();
 
   // Try resuming saved game or generate a new one
@@ -572,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* -------------------------------------------------------------
-     SETTINGS SYNC
+     SETTINGS & THEME SYNC
   ------------------------------------------------------------- */
   function syncSettingsUI() {
     toggleSound.checked = game.settings.soundEnabled;
@@ -580,7 +585,85 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleAutoCheck.checked = game.settings.autoCheckMistakes;
     toggleHighlightSame.checked = game.settings.highlightSameNumbers;
     toggleMistakeLimit.checked = game.settings.mistakeLimitEnabled;
-    themeSelect.value = game.settings.theme;
+    applyTheme(game.settings.theme || 'system');
+  }
+
+  /* -------------------------------------------------------------
+     THEME (白底黑字 vs 黑底白字) LOGIC
+  ------------------------------------------------------------- */
+  function applyTheme(theme) {
+    const validTheme = ['light', 'dark', 'system'].includes(theme) ? theme : 'system';
+    game.settings.theme = validTheme;
+    document.documentElement.setAttribute('data-theme', validTheme);
+
+    // Determine effectively whether it is currently dark or light
+    const isDark = validTheme === 'dark' || (validTheme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    // Update Header 1-tap Toggle Button:
+    // If dark -> show Sun ☀️ icon (tap to switch to 白底黑字)
+    // If light -> show Moon 🌙 icon (tap to switch to 黑底白字)
+    if (themeIconSun && themeIconMoon) {
+      if (isDark) {
+        themeIconSun.style.display = 'block';
+        themeIconMoon.style.display = 'none';
+        btnThemeToggle?.setAttribute('aria-label', '目前為黑底白字，點擊切換為白底黑字');
+        btnThemeToggle?.setAttribute('title', '切換為白底黑字 (淺色)');
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'block';
+        btnThemeToggle?.setAttribute('aria-label', '目前為白底黑字，點擊切換為黑底白字');
+        btnThemeToggle?.setAttribute('title', '切換為黑底白字 (深色)');
+      }
+    }
+
+    // Update Settings Cards Active State
+    themeCards.forEach(card => {
+      if (card.dataset.themeVal === validTheme) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    // Update iOS Safari / PWA status bar theme-color
+    const metaThemes = document.querySelectorAll('meta[name="theme-color"]');
+    metaThemes.forEach(m => {
+      if (!m.hasAttribute('media')) {
+        m.setAttribute('content', isDark ? '#000000' : '#F2F2F7');
+      }
+    });
+  }
+
+  // Header 1-tap quick toggle between 白底黑字 and 黑底白字
+  btnThemeToggle?.addEventListener('click', () => {
+    const currentTheme = game.settings.theme || 'system';
+    const isDark = currentTheme === 'dark' || (currentTheme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const newTheme = isDark ? 'light' : 'dark';
+
+    applyTheme(newTheme);
+    game.saveSettings();
+    game.sound.playTap();
+    game.sound.triggerHaptic('medium');
+  });
+
+  // Settings Modal Theme Card Pickers (白底黑字 / 黑底白字 / 跟隨系統)
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const selectedTheme = card.dataset.themeVal;
+      applyTheme(selectedTheme);
+      game.saveSettings();
+      game.sound.playTap();
+      game.sound.triggerHaptic('light');
+    });
+  });
+
+  // Listen to OS system color scheme changes when theme is 'system'
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (game.settings.theme === 'system') {
+        applyTheme('system');
+      }
+    });
   }
 
   toggleSound.addEventListener('change', () => {
@@ -610,16 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
     game.saveSettings();
     renderBoard();
   });
-
-  themeSelect.addEventListener('change', () => {
-    game.settings.theme = themeSelect.value;
-    game.saveSettings();
-    applyTheme(themeSelect.value);
-  });
-
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-  }
 
   /* -------------------------------------------------------------
      STATISTICS & LEADERBOARD MODAL

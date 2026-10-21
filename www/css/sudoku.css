@@ -913,3 +913,201 @@ input:checked + .slider:before {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ==========================================================================
+   Theme Selection: 白底黑字 vs 黑底白字 (iOS Card Pickers)
+   ========================================================================== */
+.theme-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 4px 16px 16px 16px;
+}
+
+.theme-card-btn {
+  position: relative;
+  background: var(--ios-card-bg);
+  border: 2px solid var(--ios-gray-5);
+  border-radius: 14px;
+  padding: 12px 6px 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-card-btn:active {
+  transform: scale(0.95);
+}
+
+.theme-card-btn.active {
+  border-color: var(--ios-blue);
+  background: var(--ios-card-bg-elevated);
+  box-shadow: 0 0 0 1px var(--ios-blue), var(--ios-shadow-sm);
+}
+
+/* Miniature Sudoku Preview Box inside Theme Cards */
+.theme-preview-box {
+  width: 60px;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--ios-shadow-sm);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Light Mode Preview (白底黑字) */
+.theme-preview-box.preview-light {
+  background: #FFFFFF;
+  border: 1.5px solid #D1D1D6;
+}
+.theme-preview-box.preview-light .theme-mini-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid #E5E5EA;
+  color: #000000;
+  background: #FFFFFF;
+}
+.theme-preview-box.preview-light .theme-mini-cell.clue {
+  background: #F2F2F7;
+  color: #000000;
+  font-weight: 800;
+}
+.theme-preview-box.preview-light .theme-mini-cell.user {
+  color: #007AFF;
+  font-weight: 700;
+}
+
+/* Dark Mode Preview (黑底白字) */
+.theme-preview-box.preview-dark {
+  background: #000000;
+  border: 1.5px solid #48484A;
+}
+.theme-preview-box.preview-dark .theme-mini-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid #2C2C2E;
+  color: #FFFFFF;
+  background: #1C1C1E;
+}
+.theme-preview-box.preview-dark .theme-mini-cell.clue {
+  background: #151517;
+  color: #FFFFFF;
+  font-weight: 800;
+}
+.theme-preview-box.preview-dark .theme-mini-cell.user {
+  color: #5EACFF;
+  font-weight: 700;
+}
+
+/* System Split Preview */
+.theme-preview-box.preview-split {
+  display: flex;
+  border: 1.5px solid #AEAEB2;
+}
+.split-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+.split-left {
+  background: #FFFFFF;
+  color: #000000;
+  border-right: 1px solid #C7C7CC;
+}
+.split-right {
+  background: #1C1C1E;
+  color: #FFFFFF;
+}
+
+.theme-card-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.theme-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ios-text-primary);
+}
+
+.theme-card-sub {
+  font-size: 11px;
+  color: var(--ios-text-secondary);
+}
+
+.theme-check-mark {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--ios-blue);
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 800;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.theme-card-btn.active .theme-check-mark {
+  display: flex;
+}
+
+/* Header Theme Toggle Button Smooth Rotation */
+#btn-theme-toggle svg {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#btn-theme-toggle:active svg {
+  transform: rotate(30deg) scale(0.9);
+}
+
+/* Responsive adjustments for narrow mobile header */
+@media (max-width: 420px) {
+  .ios-header-left, .ios-header-right {
+    gap: 5px;
+  }
+  .ios-icon-btn {
+    width: 35px;
+    height: 35px;
+  }
+  .ios-icon-btn svg {
+    width: 19px;
+    height: 19px;
+  }
+  .ios-title {
+    font-size: 21px;
+    gap: 6px;
+  }
+  .theme-options-grid {
+    gap: 8px;
+    padding: 4px 12px 14px 12px;
+  }
+  .theme-preview-box {
+    width: 52px;
+    height: 44px;
+  }
+  .theme-card-name {
+    font-size: 12px;
+  }
+}
+
+

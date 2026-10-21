@@ -43,7 +43,7 @@ class SudokuGame {
       autoCheckMistakes: true,
       autoRemoveNotes: true,
       mistakeLimitEnabled: false, // Default friendly free play, toggleable
-      theme: 'system' // 'system' | 'light' | 'dark'
+      theme: 'system' // 'system' | 'light' (白底黑字) | 'dark' (黑底白字)
     };
     try {
       const saved = localStorage.getItem('sudoku_settings');

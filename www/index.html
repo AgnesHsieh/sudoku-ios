@@ -17,8 +17,8 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/ios-theme.css?v=103">
-  <link rel="stylesheet" href="css/sudoku.css?v=103">
+  <link rel="stylesheet" href="css/ios-theme.css?v=107">
+  <link rel="stylesheet" href="css/sudoku.css?v=107">
 </head>
 <body>
   <div class="app-container">
@@ -34,6 +34,17 @@
         <button id="btn-stats" class="ios-icon-btn" aria-label="成績排行與統計" title="成績排行與統計">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-6.75a1.125 1.125 0 01-1.125 1.125v3.375m9 0h-9m10.5-12.75l-1.5 6a3.75 3.75 0 01-3.64 2.875h-4.72A3.75 3.75 0 014.5 12l-1.5-6H21z" />
+          </svg>
+        </button>
+        <button id="btn-theme-toggle" class="ios-icon-btn" aria-label="切換白底黑字或黑底白字" title="切換外觀（白底黑字 / 黑底白字）">
+          <!-- Moon icon for light mode (click to switch to 黑底白字) -->
+          <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+          </svg>
+          <!-- Sun icon for dark mode (click to switch to 白底黑字) -->
+          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+            <circle cx="12" cy="12" r="4" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-width="2" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
         </button>
         <button id="btn-restart" class="ios-icon-btn" aria-label="重來本局" title="重來本局">
@@ -249,17 +260,54 @@
           </div>
         </div>
 
+        <!-- Theme & Contrast Section (白底黑字 vs 黑底白字) -->
         <div class="settings-group">
-          <div class="settings-row">
+          <div class="settings-row" style="border-bottom: none; padding-bottom: 6px;">
             <div class="settings-label">
-              <span class="settings-title">外觀主題</span>
-              <span class="settings-subtitle">支援跟隨 iOS 系統深色模式</span>
+              <span class="settings-title">外觀色彩模式</span>
+              <span class="settings-subtitle">選擇白底黑字或黑底白字，提升遊戲舒適度</span>
             </div>
-            <select id="theme-select" style="background: var(--ios-gray-5); color: var(--ios-text-primary); border: none; padding: 6px 12px; border-radius: 8px; font-weight: 500; font-size: 14px;">
-              <option value="system">跟隨系統</option>
-              <option value="light">淺色模式</option>
-              <option value="dark">深色模式</option>
-            </select>
+          </div>
+          <div class="theme-options-grid">
+            <button type="button" class="theme-card-btn" data-theme-val="light" id="theme-card-light">
+              <div class="theme-preview-box preview-light">
+                <div class="theme-mini-cell clue">5</div>
+                <div class="theme-mini-cell">3</div>
+                <div class="theme-mini-cell user">7</div>
+                <div class="theme-mini-cell">9</div>
+              </div>
+              <div class="theme-card-info">
+                <span class="theme-card-name">白底黑字</span>
+                <span class="theme-card-desc">淺色明亮</span>
+              </div>
+              <div class="theme-check-mark">✓</div>
+            </button>
+
+            <button type="button" class="theme-card-btn" data-theme-val="dark" id="theme-card-dark">
+              <div class="theme-preview-box preview-dark">
+                <div class="theme-mini-cell clue">5</div>
+                <div class="theme-mini-cell">3</div>
+                <div class="theme-mini-cell user">7</div>
+                <div class="theme-mini-cell">9</div>
+              </div>
+              <div class="theme-card-info">
+                <span class="theme-card-name">黑底白字</span>
+                <span class="theme-card-desc">夜間護眼</span>
+              </div>
+              <div class="theme-check-mark">✓</div>
+            </button>
+
+            <button type="button" class="theme-card-btn" data-theme-val="system" id="theme-card-system">
+              <div class="theme-preview-box preview-split">
+                <div class="split-side split-left">5</div>
+                <div class="split-side split-right">9</div>
+              </div>
+              <div class="theme-card-info">
+                <span class="theme-card-name">跟隨系統</span>
+                <span class="theme-card-desc">自動切換</span>
+              </div>
+              <div class="theme-check-mark">✓</div>
+            </button>
           </div>
         </div>
 
@@ -509,9 +557,9 @@
   </script>
 
   <!-- Application Scripts -->
-  <script src="js/sudoku-engine.js?v=105"></script>
-  <script src="js/audio.js?v=105"></script>
-  <script src="js/game.js?v=105"></script>
-  <script src="js/app.js?v=105"></script>
+  <script src="js/sudoku-engine.js?v=107"></script>
+  <script src="js/audio.js?v=107"></script>
+  <script src="js/game.js?v=107"></script>
+  <script src="js/app.js?v=107"></script>
 </body>
 </html>
