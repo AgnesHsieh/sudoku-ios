@@ -17,8 +17,8 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/ios-theme.css?v=108">
-  <link rel="stylesheet" href="css/sudoku.css?v=108">
+  <link rel="stylesheet" href="css/ios-theme.css?v=109">
+  <link rel="stylesheet" href="css/sudoku.css?v=109">
 </head>
 <body>
   <div class="app-container">
@@ -115,15 +115,6 @@
 
       <!-- Action Toolbar -->
       <section class="ios-toolbar" aria-label="操作工具欄">
-        <button id="btn-undo" class="toolbar-btn" aria-label="復原">
-          <div class="btn-icon-wrapper">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-            </svg>
-          </div>
-          <span class="toolbar-btn-label">復原</span>
-        </button>
-
         <button id="btn-erase" class="toolbar-btn" aria-label="擦除">
           <div class="btn-icon-wrapper">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -512,16 +503,10 @@
         </div>
         <h2 id="gameover-modal-title" class="modal-title" style="margin-bottom: 6px;">達到 3 次失誤上限</h2>
         <p style="color: var(--ios-text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
-          您可以撤回最後一次失誤繼續挑戰本局，或是重新挑戰本局題目。
+          本局失誤已達 3 次上限，遊戲結束。您可以重新開始挑戰本局題目，或選擇難度開始新局。
         </p>
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-          <button id="btn-gameover-undo" class="ios-btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <svg style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5;" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-            </svg>
-            <span>撤回最後失誤（繼續本局）</span>
-          </button>
-          <button id="btn-gameover-restart" class="ios-btn-secondary" style="width: 100%;">🔄 重來本局</button>
+          <button id="btn-gameover-restart" class="ios-btn-primary" style="width: 100%;">🔄 重新開始本局</button>
           <button id="btn-gameover-newgame" class="ios-btn-secondary" style="width: 100%;">➕ 選擇難度開新局</button>
         </div>
       </div>
@@ -583,9 +568,9 @@
   </script>
 
   <!-- Application Scripts -->
-  <script src="js/sudoku-engine.js?v=108"></script>
-  <script src="js/audio.js?v=108"></script>
-  <script src="js/game.js?v=108"></script>
-  <script src="js/app.js?v=108"></script>
+  <script src="js/sudoku-engine.js?v=109"></script>
+  <script src="js/audio.js?v=109"></script>
+  <script src="js/game.js?v=109"></script>
+  <script src="js/app.js?v=109"></script>
 </body>
 </html>

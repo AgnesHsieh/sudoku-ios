@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const segmentedButtons = document.querySelectorAll('.ios-segment-btn');
 
   // Action Buttons
-  const btnUndo = document.getElementById('btn-undo');
   const btnErase = document.getElementById('btn-erase');
   const btnNotes = document.getElementById('btn-notes');
   const btnHint = document.getElementById('btn-hint');
@@ -47,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCancelRestart = document.getElementById('btn-cancel-restart');
   const btnPauseRestart = document.getElementById('btn-pause-restart');
   const btnNewGameRestart = document.getElementById('btn-newgame-restart');
-  const btnGameOverUndo = document.getElementById('btn-gameover-undo');
   const btnGameOverRestart = document.getElementById('btn-gameover-restart');
   const btnGameOverNewgame = document.getElementById('btn-gameover-newgame');
   const btnWinViewLb = document.getElementById('btn-win-view-lb');
@@ -247,14 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Update toolbar button disabled states
-    if (btnUndo) {
-      if (game.history.length === 0) {
-        btnUndo.classList.add('disabled');
-      } else {
-        btnUndo.classList.remove('disabled');
-      }
-    }
-
     if (btnErase) {
       const selected = game.selectedCell;
       const canErase = selected && game.initialBoard[selected.r][selected.c] === 0 && (game.currentBoard[selected.r][selected.c] !== 0 || (game.notes[selected.r][selected.c] && game.notes[selected.r][selected.c].size > 0));
@@ -326,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSelectedDiff = 'easy';
 
   // Toolbar Actions
-  btnUndo.addEventListener('click', () => game.undo());
   btnErase.addEventListener('click', () => game.eraseSelected());
   btnNotes.addEventListener('click', () => game.toggleNotesMode());
   btnHint.addEventListener('click', () => game.giveHint());
@@ -461,11 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hint 'h'
     else if (e.key === 'h' || e.key === 'H') {
       game.giveHint();
-    }
-    // Undo 'u' or Ctrl+Z
-    else if (e.key === 'u' || e.key === 'U' || (e.ctrlKey && e.key === 'z') || (e.metaKey && e.key === 'z')) {
-      e.preventDefault();
-      game.undo();
     }
     // Pause 'p' or Space
     else if (e.key === 'p' || e.key === 'P' || e.key === ' ') {
@@ -900,11 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
       openModal(modalGameOver);
     }
   }
-
-  btnGameOverUndo?.addEventListener('click', () => {
-    if (modalGameOver) closeModal(modalGameOver);
-    game.undo();
-  });
 
   btnGameOverRestart?.addEventListener('click', () => {
     if (modalGameOver) closeModal(modalGameOver);

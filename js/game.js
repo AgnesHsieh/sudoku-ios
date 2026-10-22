@@ -426,17 +426,12 @@ class SudokuGame {
 
   // Erase button
   eraseSelected() {
-    if (!this.selectedCell || this.isPaused || this.isComplete) return;
+    if (!this.selectedCell || this.isPaused || this.isGameOver || this.isComplete) return;
     const { r, c } = this.selectedCell;
 
     if (this.initialBoard[r][c] !== 0) return;
 
     if (this.currentBoard[r][c] !== 0 || this.notes[r][c].size > 0) {
-      if (this.isGameOver) {
-        this.isGameOver = false;
-        this.startTimer();
-      }
-      this.saveHistorySnapshot();
       this.currentBoard[r][c] = 0;
       this.notes[r][c].clear();
       this.sound.playErase();
@@ -508,40 +503,11 @@ class SudokuGame {
     }
   }
 
-  // Snapshot for undo
-  saveHistorySnapshot() {
-    // Keep max 30 moves
-    if (this.history.length > 30) this.history.shift();
+  // Snapshot for undo (disabled)
+  saveHistorySnapshot() {}
 
-    const snapshot = {
-      board: this.engine.cloneGrid(this.currentBoard),
-      notes: this.notes.map(r => r.map(set => Array.from(set || []))),
-      selected: this.selectedCell ? { ...this.selectedCell } : null,
-      mistakes: this.mistakes
-    };
-    this.history.push(snapshot);
-  }
-
-  // Undo button
-  undo() {
-    if (this.history.length === 0 || this.isPaused || this.isComplete) return;
-
-    // If game over was triggered by 3 mistakes, undo revives the game!
-    if (this.isGameOver) {
-      this.isGameOver = false;
-      this.startTimer();
-    }
-
-    const previous = this.history.pop();
-    this.currentBoard = previous.board;
-    this.notes = previous.notes.map(r => r.map(arr => new Set(arr || [])));
-    this.selectedCell = previous.selected;
-    this.mistakes = previous.mistakes;
-
-    this.sound.playTap();
-    this.saveCurrentGame();
-    if (this.onStateChange) this.onStateChange();
-  }
+  // Undo button (cancelled as requested)
+  undo() {}
 
   // Hint button: fill the selected cell or a smart cell
   giveHint() {
