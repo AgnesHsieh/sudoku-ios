@@ -41,11 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalWin = document.getElementById('modal-win');
   const modalPause = document.getElementById('modal-pause');
   const modalConfirmRestart = document.getElementById('modal-confirm-restart');
+  const modalGameOver = document.getElementById('modal-game-over');
 
   const btnConfirmRestart = document.getElementById('btn-confirm-restart');
   const btnCancelRestart = document.getElementById('btn-cancel-restart');
   const btnPauseRestart = document.getElementById('btn-pause-restart');
   const btnNewGameRestart = document.getElementById('btn-newgame-restart');
+  const btnGameOverUndo = document.getElementById('btn-gameover-undo');
+  const btnGameOverRestart = document.getElementById('btn-gameover-restart');
+  const btnGameOverNewgame = document.getElementById('btn-gameover-newgame');
   const btnWinViewLb = document.getElementById('btn-win-view-lb');
 
   // Leaderboard & Stats Tab Switcher
@@ -240,6 +244,25 @@ document.addEventListener('DOMContentLoaded', () => {
       mistakesDisplay.innerHTML = `<span class="mistake-badge">${game.mistakes}</span> / 3`;
     } else {
       mistakesDisplay.innerHTML = `<span class="mistake-badge">${game.mistakes}</span> 錯誤`;
+    }
+
+    // Update toolbar button disabled states
+    if (btnUndo) {
+      if (game.history.length === 0) {
+        btnUndo.classList.add('disabled');
+      } else {
+        btnUndo.classList.remove('disabled');
+      }
+    }
+
+    if (btnErase) {
+      const selected = game.selectedCell;
+      const canErase = selected && game.initialBoard[selected.r][selected.c] === 0 && (game.currentBoard[selected.r][selected.c] !== 0 || (game.notes[selected.r][selected.c] && game.notes[selected.r][selected.c].size > 0));
+      if (!selected || !canErase) {
+        btnErase.classList.add('disabled');
+      } else {
+        btnErase.classList.remove('disabled');
+      }
     }
 
     // Update Keypad remaining count and completion states
@@ -873,11 +896,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function showGameOverModal() {
-    alert('遊戲結束！您已達到 3 次錯誤上限。點擊確認開始新遊戲。');
-    game.initNewGame(game.difficulty);
+    if (modalGameOver) {
+      openModal(modalGameOver);
+    }
+  }
+
+  btnGameOverUndo?.addEventListener('click', () => {
+    if (modalGameOver) closeModal(modalGameOver);
+    game.undo();
+  });
+
+  btnGameOverRestart?.addEventListener('click', () => {
+    if (modalGameOver) closeModal(modalGameOver);
+    clearConfetti();
+    resumeGame();
+    game.restartCurrentGame();
     renderBoard();
     updateTimerDisplay(0);
-  }
+  });
+
+  btnGameOverNewgame?.addEventListener('click', () => {
+    if (modalGameOver) closeModal(modalGameOver);
+    resumeGame();
+    currentSelectedDiff = game.difficulty;
+    openModal(modalNewGame);
+  });
 
   /* -------------------------------------------------------------
      CANVAS CONFETTI

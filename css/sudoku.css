@@ -179,6 +179,15 @@
   color: var(--ios-blue);
 }
 
+.toolbar-btn.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.toolbar-btn.disabled:active {
+  transform: none;
+}
+
 .toolbar-btn.active .btn-icon-wrapper {
   background: var(--ios-blue);
   color: #FFFFFF;
@@ -363,8 +372,8 @@
 }
 
 .keypad-btn.completed {
-  opacity: 0.28;
-  pointer-events: none;
+  opacity: 0.35;
+  cursor: pointer;
 }
 
 .keypad-btn .keypad-count {

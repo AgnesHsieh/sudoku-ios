@@ -17,8 +17,8 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/ios-theme.css?v=107">
-  <link rel="stylesheet" href="css/sudoku.css?v=107">
+  <link rel="stylesheet" href="css/ios-theme.css?v=108">
+  <link rel="stylesheet" href="css/sudoku.css?v=108">
 </head>
 <body>
   <div class="app-container">
@@ -501,6 +501,32 @@
       </div>
     </div>
 
+    <!-- Game Over Modal (達到失誤上限) -->
+    <div id="modal-game-over" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="gameover-modal-title">
+      <div class="ios-modal-sheet" style="text-align: center; max-width: 380px;">
+        <div class="modal-drag-handle"></div>
+        <div style="width: 56px; height: 56px; margin: 4px auto 12px auto; border-radius: 50%; background: rgba(255, 59, 48, 0.12); display: flex; align-items: center; justify-content: center; color: var(--ios-red);">
+          <svg style="width: 32px; height: 32px; stroke: currentColor; fill: none; stroke-width: 2.2;" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h2 id="gameover-modal-title" class="modal-title" style="margin-bottom: 6px;">達到 3 次失誤上限</h2>
+        <p style="color: var(--ios-text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+          您可以撤回最後一次失誤繼續挑戰本局，或是重新挑戰本局題目。
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <button id="btn-gameover-undo" class="ios-btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5;" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            </svg>
+            <span>撤回最後失誤（繼續本局）</span>
+          </button>
+          <button id="btn-gameover-restart" class="ios-btn-secondary" style="width: 100%;">🔄 重來本局</button>
+          <button id="btn-gameover-newgame" class="ios-btn-secondary" style="width: 100%;">➕ 選擇難度開新局</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Win Modal -->
     <div id="modal-win" class="ios-modal-overlay" role="dialog" aria-modal="true">
       <div class="ios-modal-sheet win-modal-content">
@@ -557,9 +583,9 @@
   </script>
 
   <!-- Application Scripts -->
-  <script src="js/sudoku-engine.js?v=107"></script>
-  <script src="js/audio.js?v=107"></script>
-  <script src="js/game.js?v=107"></script>
-  <script src="js/app.js?v=107"></script>
+  <script src="js/sudoku-engine.js?v=108"></script>
+  <script src="js/audio.js?v=108"></script>
+  <script src="js/game.js?v=108"></script>
+  <script src="js/app.js?v=108"></script>
 </body>
 </html>

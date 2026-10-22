@@ -187,6 +187,14 @@ class SudokuGame {
         row.map(set => Array.from(set))
       );
 
+      // Serialize history notes Sets to arrays
+      const serializableHistory = (this.history || []).map(snapshot => ({
+        ...snapshot,
+        notes: (snapshot.notes || []).map(row =>
+          row.map(set => Array.isArray(set) ? set : Array.from(set || []))
+        )
+      }));
+
       const state = {
         difficulty: this.difficulty,
         initialBoard: this.initialBoard,
@@ -196,7 +204,7 @@ class SudokuGame {
         mistakes: this.mistakes,
         hintsUsed: this.hintsUsed,
         timerSeconds: this.timerSeconds,
-        history: this.history
+        history: serializableHistory
       };
       localStorage.setItem('sudoku_active_game', JSON.stringify(state));
     } catch (e) {}
@@ -221,7 +229,12 @@ class SudokuGame {
       this.mistakes = state.mistakes || 0;
       this.hintsUsed = state.hintsUsed || 0;
       this.timerSeconds = state.timerSeconds || 0;
-      this.history = state.history || [];
+      this.history = (state.history || []).map(snapshot => ({
+        ...snapshot,
+        notes: (snapshot.notes || []).map(row =>
+          row.map(arr => new Set(arr || []))
+        )
+      }));
       this.selectedCell = null;
       this.isNotesMode = false;
       this.isPaused = false;
@@ -413,12 +426,16 @@ class SudokuGame {
 
   // Erase button
   eraseSelected() {
-    if (!this.selectedCell || this.isPaused || this.isGameOver || this.isComplete) return;
+    if (!this.selectedCell || this.isPaused || this.isComplete) return;
     const { r, c } = this.selectedCell;
 
     if (this.initialBoard[r][c] !== 0) return;
 
     if (this.currentBoard[r][c] !== 0 || this.notes[r][c].size > 0) {
+      if (this.isGameOver) {
+        this.isGameOver = false;
+        this.startTimer();
+      }
       this.saveHistorySnapshot();
       this.currentBoard[r][c] = 0;
       this.notes[r][c].clear();
@@ -498,7 +515,7 @@ class SudokuGame {
 
     const snapshot = {
       board: this.engine.cloneGrid(this.currentBoard),
-      notes: this.notes.map(r => r.map(set => new Set(set))),
+      notes: this.notes.map(r => r.map(set => Array.from(set || []))),
       selected: this.selectedCell ? { ...this.selectedCell } : null,
       mistakes: this.mistakes
     };
@@ -507,11 +524,17 @@ class SudokuGame {
 
   // Undo button
   undo() {
-    if (this.history.length === 0 || this.isPaused || this.isGameOver || this.isComplete) return;
+    if (this.history.length === 0 || this.isPaused || this.isComplete) return;
+
+    // If game over was triggered by 3 mistakes, undo revives the game!
+    if (this.isGameOver) {
+      this.isGameOver = false;
+      this.startTimer();
+    }
 
     const previous = this.history.pop();
     this.currentBoard = previous.board;
-    this.notes = previous.notes;
+    this.notes = previous.notes.map(r => r.map(arr => new Set(arr || [])));
     this.selectedCell = previous.selected;
     this.mistakes = previous.mistakes;
 
@@ -643,7 +666,15 @@ class SudokuGame {
       for (let c = 0; c < 9; c++) {
         const val = this.currentBoard[r][c];
         if (val >= 1 && val <= 9) {
-          counts[val]++;
+          // If autoCheckMistakes is enabled, only count cells that match solution
+          // so that an erroneous placement never falsely completes or locks out the digit button!
+          if (this.settings.autoCheckMistakes) {
+            if (val === this.solution[r][c]) {
+              counts[val]++;
+            }
+          } else {
+            counts[val]++;
+          }
         }
       }
     }

@@ -3,7 +3,7 @@
  * 支援無網路 (飛航模式) 與完全脫離電腦獨立運行
  */
 
-const CACHE_NAME = 'sudoku-ios-v7';
+const CACHE_NAME = 'sudoku-ios-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
