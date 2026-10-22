@@ -42,10 +42,13 @@
   --ios-thick-separator: #48484A;
   
   /* Sudoku Highlights */
-  --cell-selected-bg: #E3F2FD;
-  --cell-selected-border: #007AFF;
+  --cell-selected-bg: #E0F2FE;
+  --cell-selected-border: #0284C7;
   --cell-highlight-bg: #F0F4F8;
-  --cell-same-number-bg: #DCEAFE;
+  --cell-same-number-bg: #BAE6FD;
+  --cell-same-number-color: #0369A1;
+  --cell-same-number-border: #38BDF8;
+  --cell-same-number-glow: rgba(56, 189, 248, 0.35);
   --cell-error-bg: #FEE2E2;
   --cell-error-color: #FF3B30;
   --cell-note-color: #64748B;
@@ -99,10 +102,13 @@
   --ios-thick-separator: #8E8E93;
 
   /* Sudoku Highlights */
-  --cell-selected-bg: rgba(10, 132, 255, 0.3);
-  --cell-selected-border: #0A84FF;
+  --cell-selected-bg: rgba(2, 132, 199, 0.45);
+  --cell-selected-border: #38BDF8;
   --cell-highlight-bg: rgba(255, 255, 255, 0.05);
-  --cell-same-number-bg: rgba(10, 132, 255, 0.22);
+  --cell-same-number-bg: rgba(14, 165, 233, 0.38);
+  --cell-same-number-color: #38BDF8;
+  --cell-same-number-border: #0EA5E9;
+  --cell-same-number-glow: rgba(14, 165, 233, 0.45);
   --cell-error-bg: rgba(255, 69, 58, 0.28);
   --cell-error-color: #FF6961;
   --cell-note-color: #94A3B8;
@@ -150,10 +156,13 @@
     --ios-separator: #2C2C2E;
     --ios-thick-separator: #8E8E93;
 
-    --cell-selected-bg: rgba(10, 132, 255, 0.3);
-    --cell-selected-border: #0A84FF;
+    --cell-selected-bg: rgba(2, 132, 199, 0.45);
+    --cell-selected-border: #38BDF8;
     --cell-highlight-bg: rgba(255, 255, 255, 0.05);
-    --cell-same-number-bg: rgba(10, 132, 255, 0.22);
+    --cell-same-number-bg: rgba(14, 165, 233, 0.38);
+    --cell-same-number-color: #38BDF8;
+    --cell-same-number-border: #0EA5E9;
+    --cell-same-number-glow: rgba(14, 165, 233, 0.45);
     --cell-error-bg: rgba(255, 69, 58, 0.28);
     --cell-error-color: #FF6961;
     --cell-note-color: #94A3B8;

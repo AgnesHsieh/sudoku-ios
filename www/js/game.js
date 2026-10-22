@@ -23,6 +23,7 @@ class SudokuGame {
     this.isPaused = false;
     this.isGameOver = false;
     this.isComplete = false;
+    this.activeHighlightNumber = 0;
 
     this.settings = this.loadSettings();
     this.stats = this.loadStats();
@@ -134,6 +135,7 @@ class SudokuGame {
     this.isPaused = false;
     this.isGameOver = false;
     this.isComplete = false;
+    this.activeHighlightNumber = 0;
 
     this.sound.playErase();
     this.startTimer();
@@ -166,6 +168,7 @@ class SudokuGame {
     this.isPaused = false;
     this.isGameOver = false;
     this.isComplete = false;
+    this.activeHighlightNumber = 0;
 
     // Record game played in stats
     if (this.stats[this.difficulty]) {

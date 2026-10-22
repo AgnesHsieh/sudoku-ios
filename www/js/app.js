@@ -115,6 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selected = game.selectedCell;
     const selectedVal = selected ? game.currentBoard[selected.r][selected.c] : 0;
+
+    // Determine target number to highlight:
+    // If a non-empty cell is selected, it defines the active highlight number.
+    if (selected) {
+      if (selectedVal > 0) {
+        game.activeHighlightNumber = selectedVal;
+      } else {
+        game.activeHighlightNumber = 0;
+      }
+    }
+    const targetNumber = game.activeHighlightNumber || 0;
+
     const conflicts = game.settings.autoCheckMistakes
       ? game.engine.findConflicts(game.currentBoard)
       : new Set();
@@ -155,12 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // Check same number highlight
+        // Check same number highlight (lights up and color-shifts all instances of targetNumber!)
         if (
           game.settings.highlightSameNumbers &&
-          selectedVal > 0 &&
-          currentVal === selectedVal &&
-          !isSelected
+          targetNumber > 0 &&
+          currentVal === targetNumber
         ) {
           cell.classList.add('same-number');
         }
@@ -187,7 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let num = 1; num <= 9; num++) {
               const noteSpan = document.createElement('span');
               noteSpan.className = 'note-digit';
-              noteSpan.textContent = cellNotes.has(num) ? num : '';
+              if (cellNotes.has(num)) {
+                noteSpan.textContent = num;
+                if (game.settings.highlightSameNumbers && targetNumber > 0 && num === targetNumber) {
+                  noteSpan.classList.add('active-candidate');
+                }
+              }
               notesGrid.appendChild(noteSpan);
             }
             cell.appendChild(notesGrid);
@@ -261,6 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateKeypadUI() {
     const counts = game.getNumberCounts();
+    const activeNum = game.activeHighlightNumber || 0;
+
     keypadButtons.forEach(btn => {
       const num = parseInt(btn.dataset.num, 10);
       const placed = counts[num] || 0;
@@ -273,6 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         btn.classList.remove('completed');
         if (countEl) countEl.textContent = remaining;
+      }
+
+      // Highlight active number button
+      if (activeNum > 0 && num === activeNum) {
+        btn.classList.add('active-number');
+      } else {
+        btn.classList.remove('active-number');
       }
     });
   }
@@ -338,11 +363,24 @@ document.addEventListener('DOMContentLoaded', () => {
     game.autoFillCandidatesForSelected();
   });
 
-  // Main Keypad Numbers (非筆記的數字 - 點擊直接填入)
+  // Main Keypad Numbers (點擊直接填入，或點選打亮該數字)
   keypadButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const num = parseInt(btn.dataset.num, 10);
-      game.fillNumber(num);
+      const selected = game.selectedCell;
+      const isClue = selected ? game.initialBoard[selected.r][selected.c] !== 0 : true;
+
+      if (!selected || isClue) {
+        // 未選中空格或選中提示格時，點擊數字直接高亮/打亮盤面上所有該數字
+        game.activeHighlightNumber = (game.activeHighlightNumber === num) ? 0 : num;
+        game.sound.playTap();
+        renderBoard();
+      } else {
+        // 已選中空格，填入數字並高亮該數字
+        game.fillNumber(num);
+        game.activeHighlightNumber = num;
+        renderBoard();
+      }
     });
   });
 
@@ -433,10 +471,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Number keys (1-9)
     if (e.key >= '1' && e.key <= '9') {
       const num = parseInt(e.key, 10);
-      if (game.isNotesMode || e.shiftKey) {
+      const selected = game.selectedCell;
+      const isClue = selected ? game.initialBoard[selected.r][selected.c] !== 0 : true;
+
+      if (!selected || isClue) {
+        game.activeHighlightNumber = (game.activeHighlightNumber === num) ? 0 : num;
+        game.sound.playTap();
+        renderBoard();
+      } else if (game.isNotesMode || e.shiftKey) {
         game.toggleNoteForSelected(num);
       } else {
         game.fillNumber(num);
+        game.activeHighlightNumber = num;
+        renderBoard();
       }
     }
     // Delete / Backspace
